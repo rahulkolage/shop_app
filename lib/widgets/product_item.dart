@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import './../screens/product_detail_screen.dart';
 import './../providers/product.dart';
+import './../providers/cart.dart';
 
 class ProductItem extends StatelessWidget {
   // we will get data using Provider
@@ -15,6 +16,12 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
+    
+    // added listen property as we are not interested in changes to cart
+    // becasuse here we only want to tell cart that added new item to cart 
+    // and not interested in changes to cart
+    final cart = Provider.of<Cart>(context, listen: false);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -37,7 +44,10 @@ class ProductItem extends StatelessWidget {
           ),
           trailing: IconButton(
             icon: const Icon(Icons.shopping_cart),
-            onPressed: () {},
+            onPressed: () {
+              cart.addItem(product.id, product.price, product.title);
+              
+            },
             color: Theme.of(context).colorScheme.secondary,
           ),
         ),

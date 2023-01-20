@@ -14,13 +14,17 @@ class ProductGrid extends StatelessWidget {
 
   // final List<Product> loadedProducts;
 
+  final bool showFavorites;
+
+  const ProductGrid(this.showFavorites, {super.key});
+
   @override
   Widget build(BuildContext context) {
     // Adding listener, which type of data we want to listen to
     final productsData = Provider.of<ProductsProvider>(context);
 
     // fetch products from productsData object
-    final products = productsData.items;
+    final products = showFavorites ? productsData.favoriteItems : productsData.items;
 
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),

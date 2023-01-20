@@ -40,26 +40,27 @@ class ProductsProvider with ChangeNotifier {
   ];
 
   // this is for pop up menu in products overview page
-  var _showFavoritesOnly = false;
+  // var _showFavoritesOnly = false;
 
-  // this approach is good for application wide filter
+  // this filtering approach using _showFavoritesOnly is good for application wide filter
   List<Product> get items {
-    if (_showFavoritesOnly) {
-      return _items.where((item) => item.isFavorite).toList();
-    }
+    // if (_showFavoritesOnly) {
+    //   return _items.where((item) => item.isFavorite).toList();
+    // }
+
     // spread operator, returns copy of _items
     return [..._items];
   }
 
-  void showFavoritesOnly() {
-    _showFavoritesOnly = true;
-    notifyListeners();
-  }
+  // void showFavoritesOnly() {
+  //   _showFavoritesOnly = true;
+  //   notifyListeners();
+  // }
 
-  void showAll() {
-    _showFavoritesOnly = false;
-    notifyListeners();
-  }
+  // void showAll() {
+  //   _showFavoritesOnly = false;
+  //   notifyListeners();
+  // }
 
   void addProduct() {
     // _items.a;
@@ -68,5 +69,9 @@ class ProductsProvider with ChangeNotifier {
 
   Product findById(String id) {
     return _items.firstWhere((prod) => prod.id == id);
+  }
+
+  List<Product> get favoriteItems {
+    return _items.where((item) => item.isFavorite).toList();
   }
 }

@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './../widgets/products_grid.dart';
-import './../providers/products_provider.dart';
+import './../widgets/badge.dart';
+import './../providers/cart.dart';
+import './cart_screen.dart';
 
 enum FilterOptions {
   Favorites,
   All,
 }
 
-class ProductsOverviewScreen extends StatelessWidget {
-  // ProductsOverviewScreen({super.key});
+class ProductsOverviewScreen extends StatefulWidget {
+  @override
+  State<ProductsOverviewScreen> createState() => _ProductsOverviewScreenState();
+}
+
+class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
+  var _showFavoritesOnly = false;
 
   @override
   Widget build(BuildContext context) {
-    final productData = Provider.of<ProductsProvider>(context, listen: false);
+    // // instead use Stateful widget
+    // final productData = Provider.of<ProductsProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,13 +29,14 @@ class ProductsOverviewScreen extends StatelessWidget {
         actions: [
           PopupMenuButton(
             onSelected: (FilterOptions selectedValue) {
-              // print(selectedValue);
-              if (selectedValue == FilterOptions.Favorites) {
-                productData.showFavoritesOnly();
-              } else {
-                // show all items
-                productData.showAll();
-              }
+              setState(() {
+                if (selectedValue == FilterOptions.Favorites) {
+                  _showFavoritesOnly = true;
+                } else {
+                  // show all items
+                  _showFavoritesOnly = false;
+                }
+              });
             },
             icon: const Icon(Icons.more_vert),
             itemBuilder: (_) => [
@@ -38,9 +47,23 @@ class ProductsOverviewScreen extends StatelessWidget {
                   value: FilterOptions.All, child: Text('Show All')),
             ],
           ),
+          // we are using Consumer approach as we don't want to fire build of whole widget
+          Consumer<Cart>(
+            builder: (_, cart, ch) => Badge(
+              child: ch!,     // passing IconButton to builder child
+              value: cart.itemCount
+                  .toString(), // count of products using Consumer approach
+            ),
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
+              icon: const Icon(Icons.shopping_cart),
+            ),
+          )
         ],
       ),
-      body: ProductGrid(),
+      body: ProductGrid(_showFavoritesOnly),
     );
   }
 }
