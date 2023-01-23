@@ -16,9 +16,9 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
-    
+
     // added listen property as we are not interested in changes to cart
-    // becasuse here we only want to tell cart that added new item to cart 
+    // becasuse here we only want to tell cart that added new item to cart
     // and not interested in changes to cart
     final cart = Provider.of<Cart>(context, listen: false);
 
@@ -27,8 +27,10 @@ class ProductItem extends StatelessWidget {
       child: GridTile(
         footer: GridTileBar(
           backgroundColor: Colors.black87,
-          leading: Consumer<Product>(       // <===== using Consumer, chap. 200
-            builder: (ctx, product, _) => IconButton(   //child IS REPLACED with "_" as currently it is not required
+          leading: Consumer<Product>(
+            // <===== using Consumer, chap. 200
+            builder: (ctx, product, _) => IconButton(
+              //child IS REPLACED with "_" as currently it is not required
               icon: Icon(
                 product.isFavorite ? Icons.favorite : Icons.favorite_border,
               ),
@@ -46,7 +48,16 @@ class ProductItem extends StatelessWidget {
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
               cart.addItem(product.id, product.price, product.title);
-              
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Added item to the cart!'),
+                  duration: Duration(seconds: 2),
+                  action: SnackBarAction(label: 'UNDO',onPressed: (() {
+                    cart.removeItem(product.id);
+                  }),),
+                ),
+              );
             },
             color: Theme.of(context).colorScheme.secondary,
           ),
