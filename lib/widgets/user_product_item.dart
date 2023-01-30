@@ -13,7 +13,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+    final scaffold = ScaffoldMessenger.of(context);
 
     return ListTile(
       title: Text(title),
@@ -26,16 +26,27 @@ class UserProductItem extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(EditProductScreen.routeName, arguments: id);
+                Navigator.of(context)
+                    .pushNamed(EditProductScreen.routeName, arguments: id);
               },
               icon: const Icon(Icons.edit),
               color: Theme.of(context).primaryColor,
             ),
             IconButton(
-              onPressed: () {
+              onPressed: () async {
                 // we can pass callback function from user_producs_screen to this page constructor
                 // or can add provider here directly
-                Provider.of<ProductsProvider>(context, listen: false).deleteProduct(id);
+
+                try {
+                  await Provider.of<ProductsProvider>(context, listen: false)
+                      .deleteProduct(id);
+                } catch (error) {
+                  scaffold.showSnackBar(const SnackBar(
+                      content: Text(
+                    'Deleting failed!',
+                    textAlign: TextAlign.center,
+                  )));
+                }
               },
               icon: const Icon(Icons.delete),
               color: Theme.of(context).errorColor,
