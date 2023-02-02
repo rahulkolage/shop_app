@@ -49,6 +49,13 @@ class ProductsProvider with ChangeNotifier {
   // this is for pop up menu in products overview page
   // var _showFavoritesOnly = false;
 
+  final String? authToken;
+  final String? userId;
+
+  // constructor
+  // used for getting token from auth.dart to products_provider via main.dart
+  ProductsProvider(this.authToken, this.userId, this._items);
+
   // this filtering approach using _showFavoritesOnly is good for application wide filter
   List<Product> get items {
     // if (_showFavoritesOnly) {
@@ -77,21 +84,34 @@ class ProductsProvider with ChangeNotifier {
     return _items.where((item) => item.isFavorite).toList();
   }
 
-  Future<void> fetchAndSetProducts() async {
-    final url = Uri.https(
-        'flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app',
-        '/products.json');
+  // filterByUser, optional positional argument
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    final url = Uri.parse(
+        'https://flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken&$filterString');
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
+      if (extractedData == null) {
+        return;
+      }
+
+      // get favorites
+      final favUrl = Uri.parse(
+          'https://flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app/userFavorites/$userId.json?auth=$authToken');
+      final favoriteResponse = await http.get(favUrl);
+      final favoriteData = json.decode(favoriteResponse.body);
+
       extractedData.forEach((productId, productData) {
         loadedProducts.add(Product(
           id: productId,
           title: productData['title'],
           description: productData['description'],
           price: productData['price'],
-          isFavorite: productData['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[productId] ?? false,
           imageUrl: productData['imageUrl'],
         ));
       });
@@ -104,9 +124,9 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    final url = Uri.https(
-        'flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app',
-        '/products.json');
+    final url = Uri.parse(
+        'https://flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken');
+
     try {
       final response = await http.post(
         url,
@@ -115,7 +135,8 @@ class ProductsProvider with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
+          // 'isFavorite': product.isFavorite,  // no longer needed here , as we stored it in userFavorites
+          'creatorId': userId,
         }),
       );
       final newProd = Product(
@@ -162,9 +183,11 @@ class ProductsProvider with ChangeNotifier {
     final _prodIndex = _items.indexWhere((prod) => prod.id == id);
 
     if (_prodIndex >= 0) {
-      final url = Uri.https(
-          'flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app',
-          '/products/$id.json');
+      // final url = Uri.https(
+      //     'flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app',
+      //     '/products/$id.json');
+      final url = Uri.parse(
+          'https://flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json?auth=$authToken');
 
       await http.patch(url,
           body: json.encode({
@@ -182,9 +205,11 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = Uri.https(
-        'flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app',
-        '/products/$id.json');
+    // final url = Uri.https(
+    //     'flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app',
+    //     '/products/$id.json');
+    final url = Uri.parse(
+        'https://flutter-http-2f887-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json?auth=$authToken');
 
     final existingProductIndex =
         _items.indexWhere((product) => product.id == id);
