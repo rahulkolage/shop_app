@@ -55,9 +55,12 @@ class ProductItem extends StatelessWidget {
                 SnackBar(
                   content: const Text('Added item to the cart!'),
                   duration: const Duration(seconds: 2),
-                  action: SnackBarAction(label: 'UNDO',onPressed: (() {
-                    cart.removeItem(product.id!);
-                  }),),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: (() {
+                      cart.removeItem(product.id!);
+                    }),
+                  ),
                 ),
               );
             },
@@ -65,20 +68,29 @@ class ProductItem extends StatelessWidget {
           ),
         ),
         child: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushNamed(ProductDetailScreen.routeName,
-                arguments: product.id);
-            // Navigator.of(context).push(
-            //   MaterialPageRoute(
-            //     builder: (context) => ProductDetailScreen(title),
-            //   ),
-            // );
-          },
-          child: Image.network(
-            product.imageUrl,
-            fit: BoxFit.cover,
-          ),
-        ),
+            onTap: () {
+              Navigator.of(context).pushNamed(ProductDetailScreen.routeName,
+                  arguments: product.id);
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => ProductDetailScreen(title),
+              //   ),
+              // );
+            },
+            child: Hero(
+              tag: product.id!,
+              child: FadeInImage(
+                placeholder:
+                    const AssetImage('assets/images/product-placeholder.png'),
+                image: NetworkImage(product.imageUrl),
+                fit: BoxFit.cover,
+              ),
+            )
+            // Image.network(
+            //   product.imageUrl,
+            //   fit: BoxFit.cover,
+            // ),
+            ),
       ),
     );
 

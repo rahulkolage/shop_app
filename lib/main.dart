@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import './screens/splash_screen.dart';
 import './screens/products_overview_screen.dart';
 import './screens/product_detail_screen.dart';
 import './screens/cart_screen.dart';
@@ -33,8 +34,8 @@ class MyApp extends StatelessWidget {
             // value: is auth object of Auth provider which is passed to ChangeNotifierProxyProvider
             // previous: is previous state i.e. old products object
             update: (ctx, auth, previousProducts) => ProductsProvider(
-                auth.token!,
-                auth.userId!,
+                auth.token,
+                auth.userId,
                 previousProducts == null ? [] : previousProducts.items),
             create: (ctx) {
               // return instane of provider class
@@ -48,10 +49,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProxyProvider<Auth, Orders>(
             update: (ctx, auth, previousOrders) => Orders(
-              auth.token!,
-              auth.userId!,
-              previousOrders == null ? [] : previousOrders.orders
-            ),
+                auth.token,
+                auth.userId,
+                previousOrders == null ? [] : previousOrders.orders),
             create: (ctx) {
               return Orders(null, null, []);
             },
@@ -71,7 +71,23 @@ class MyApp extends StatelessWidget {
                 button: TextStyle(color: Colors.white),
               ),
             ),
-            home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+            // if not authenticated, instead of showing AuthScreen() directly,
+            // try to call auto login. and in buidler based on connection state
+            // we want check if ConnectionState.waiting then show some waiting indicator
+            // for other case like success or fail, we can use authResultSnapshot.data == false
+            // then return AuthScreen or return ProductsOverviewScreen,
+            // but that is not needed as call to tryAutoLogin(), this will rebuild.
+            // and auth.isAuth get success and will render ProductsOverviewScreen
+            home: auth.isAuth
+                ? ProductsOverviewScreen()
+                : FutureBuilder(
+                    future: auth.tryAutoLogin(),
+                    builder: (ctx, authResultSnapshot) =>
+                        authResultSnapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? SplashScreen()
+                            : AuthScreen(),
+                  ),
             routes: {
               ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
               CartScreen.routeName: (context) => CartScreen(),

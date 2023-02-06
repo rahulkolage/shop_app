@@ -200,7 +200,7 @@ class ProductsProvider with ChangeNotifier {
       _items[_prodIndex] = newProd;
       notifyListeners();
     } else {
-      print('not found');
+      print('Not found');
     }
   }
 

@@ -14,3 +14,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+-   key is removed from auth.dart line 42, replace it with own firebase key
+
+-   https://github.com/gokulcm09/shop-app-using-flutter
