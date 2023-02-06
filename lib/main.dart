@@ -15,6 +15,8 @@ import './providers/products_provider.dart';
 import './providers/cart.dart';
 import './providers/orders.dart';
 
+import './helpers/custom_route.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -69,6 +71,12 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Lato',
               textTheme: const TextTheme(
                 button: TextStyle(color: Colors.white),
+              ),
+              pageTransitionsTheme: PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: CustomPageTransitionBuilder(),
+                  TargetPlatform.iOS: CustomPageTransitionBuilder(),
+                },
               ),
             ),
             // if not authenticated, instead of showing AuthScreen() directly,

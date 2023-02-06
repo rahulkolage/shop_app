@@ -17,4 +17,11 @@ samples, guidance on mobile development, and a full API reference.
 
 -   key is removed from auth.dart line 42, replace it with own firebase key
 
+### Links
 -   https://github.com/gokulcm09/shop-app-using-flutter
+-   https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
+
+
+### Images
+-   https://cdn.pixabay.com/photo/2022/10/24/11/55/autumn-7543217_1280.jpg
+
